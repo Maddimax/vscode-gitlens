@@ -118,6 +118,27 @@ export function GraphWrapper({
 	const [settings, setSettings] = useState(config);
 	const [logState, setLogState] = useState(log);
 	const [isLoading, setIsLoading] = useState(false);
+  const graphWidthOffset = 20;
+  const graphHeightOffset = 100;
+  const [dimensions, setDimensions] = useState({
+    height: window.innerHeight - graphHeightOffset,
+    width: window.innerWidth - graphWidthOffset
+  });
+
+  useEffect(() => {
+    function handleResize() {
+      setDimensions({
+        height: window.innerHeight - graphHeightOffset,
+        width: window.innerWidth - graphWidthOffset
+      });
+    }
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  });
 
 	function transformData(state: State) {
 		setGraphList(getGraphModel(state.commits, state.remotes, state.tags, state.branches));
@@ -166,10 +187,12 @@ export function GraphWrapper({
 					<GraphContainer
 						cssVariables={getCssVariables()}
 						graphRows={graphList}
+            height={dimensions.height}
 						hasMoreCommits={logState?.hasMore}
 						isLoadingRows={isLoading}
 						nonce={nonce}
 						onShowMoreCommitsClicked={handleMoreCommits}
+            width={dimensions.width}
 					/>
 				</>
 			) : (
